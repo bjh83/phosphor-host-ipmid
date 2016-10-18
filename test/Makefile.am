@@ -20,8 +20,14 @@ ipmid_unittest_SOURCES = \
 	ipmid-test-utils.cpp \
 	ipmid-router-test.cpp \
 	dbus-test.cpp \
-	ipmid-server-test.cpp
+	ipmid-server-test.cpp \
+	gipmi-encoder-test.cpp \
+	gipmi-slave-test.cpp \
+	gipmi-test.cpp
 ipmid_unittest_LDADD = \
 	$(top_builddir)/ipmid-router.o \
 	$(top_builddir)/dbus.o \
-	$(top_builddir)/ipmid-server.o
+	$(top_builddir)/ipmid-server.o \
+	$(top_builddir)/gipmi-common.o \
+	$(top_builddir)/gipmi-master.o \
+	$(top_builddir)/gipmi-slave.o

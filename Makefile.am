@@ -7,6 +7,9 @@ ipmid_SOURCES = \
 	ipmid-router.cpp \
 	ipmid-server.cpp \
 	dbus.cpp \
+	gipmi-common.cpp \
+	gipmi-master.cpp \
+	gipmi-slave.cpp \
 	ipmid.cpp
 	ipmiwhitelist.cpp
 nodist_ipmid_SOURCES = ipmiwhitelist.cpp
