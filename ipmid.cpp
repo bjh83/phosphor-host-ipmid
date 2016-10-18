@@ -14,6 +14,7 @@
 
 #include "dbus-impl.hpp"
 #include "ipmid-server.hpp"
+#include "gipmi-slave.hpp"
 
 using std::unique_ptr;
 using ipmid::DBus;
@@ -26,6 +27,8 @@ using ipmid::IpmiMessageBusImpl;
 using ipmid::IpmidServer;
 using ipmid::OemGroupRouter;
 using ipmid::RootRouter;
+using gipmi::GipmiRpcServer;
+using gipmi::kBlockTransferHeaderSize;
 
 FILE *ipmiio, *ipmidbus, *ipmicmddetails;
 
@@ -154,6 +157,21 @@ sd_bus_slot *ipmid_get_sd_bus_slot(void) {
     return ipmid_server->mutable_dbus()->mutable_sd_bus_slot();
 }
 
+class TestGipmiRpcServer : public GipmiRpcServer {
+ public:
+  TestGipmiRpcServer(OemGroupRouter* router)
+      : GipmiRpcServer(router) {}
+
+  std::string HandleMessage(const string& message) override {
+    printf("slave: received request: %s\n", message.c_str());
+    return "Hello!";
+  }
+};
+
+namespace gipmi {
+void InitMaster();
+} // namespace gipmi
+
 int main(int argc, char *argv[])
 {
     int r;
@@ -197,12 +215,16 @@ int main(int argc, char *argv[])
     unique_ptr<RootRouter> root_router(new RootRouter(
         std::make_unique<IpmiMessageBusImpl>(dbus.get())));
 
+    TestGipmiRpcServer rpc_server(root_router->mutable_oem_group_router());
+
     IpmidServer server(std::move(dbus),
                        std::move(root_router),
                        whitelist);
     ipmid_server = &server;
     server.UpdateRestrictedMode();
     LOG(INFO) << "ipmid initialization complete.";
+
+    gipmi::InitMaster();
 
     for (;;) {
         if (server.HandleRequest()) {
