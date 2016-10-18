@@ -1,5 +1,6 @@
 #include <string>
 #include <string.h>
+#include <glog/logging.h>
 
 #include "gipmi.hpp"
 
@@ -63,7 +64,7 @@ IpmiMessage GipmiEncoder::Next()
     if (index_ >= count_)
     {
         // TODO: Do ERROR handling.
-        ERROR("Message has already been fully encoded.\n");
+        LOG(ERROR) << "Message has already been fully encoded.";
     }
     IpmiMessage ipmi_message;
     ipmi_message.payload.resize(kIpmiMaxPayloadSize);
@@ -107,8 +108,8 @@ void GipmiDecoder::PutNext(const IpmiMessage& ipmi_message)
     if (index_++ != gipmi_message->index)
     {
         // TODO: Do ERROR handling.
-        ERROR("Received out of order message. Expected %ld, but got %d\n", index_ - 1,
-              gipmi_message->index);
+        LOG(ERROR) << "Received out of order message. Expected " << index_ - 1
+                   << ", but got " << gipmi_message->index;
     }
     message_.append(reinterpret_cast<const char*>(gipmi_message->payload),
                     GipmiPayloadSizeFromIpmiPayloadSize(ipmi_message.payload.size()));
@@ -143,7 +144,7 @@ BlockTransferMessage GipmiBlockTransferEncoder::Next()
     if (index_ >= count_)
     {
         // TODO: Do ERROR handling.
-        ERROR("Message has already been fully encoded.\n");
+        LOG(ERROR) << "Message has already been fully encoded.";
     }
     BlockTransferMessage bt_message;
     GipmiMessage* gipmi_message = reinterpret_cast<GipmiMessage*>
@@ -185,8 +186,8 @@ void GipmiBlockTransferDecoder::PutNext(const BlockTransferMessage& bt_message)
     if (index_++ != gipmi_message->index)
     {
         // TODO: Do ERROR handling.
-        ERROR("Received out of order message. Expected %ld, but got %d\n", index_ - 1,
-              gipmi_message->index);
+        LOG(ERROR) << "Received out of order message. Expected " << index_ - 1
+                   << ", but got " << gipmi_message->index;
     }
     message_.append(reinterpret_cast<const char*>(gipmi_message->payload),
                     GipmiPayloadSizeFromBlockTransferLen(bt_message.len));

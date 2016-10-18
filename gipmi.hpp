@@ -15,8 +15,6 @@ class sd_bus_message;
 namespace gipmi
 {
 
-#define ERROR(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
-
 static const size_t kBlockTransferHeaderSize = 4;
 static const size_t kBlockTransferMaxTotalSize = 256;
 static const size_t kBlockTransferMaxPayloadSize = kBlockTransferMaxTotalSize -

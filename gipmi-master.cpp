@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <stdint.h>
+#include <glog/logging.h>
 
 #include "gipmi.hpp"
 #include "gipmi-master.hpp"
@@ -33,7 +34,8 @@ void BlockTransferMaster::ReceiveInternal(const BlockTransferMessage& message)
     auto iter = handler_map_.find(message.seq);
     if (iter == handler_map_.end())
     {
-        ERROR("No handler for message with seq: %d\n", message.seq);
+        // TODO: Should this be a warning or an error.
+        LOG(ERROR) << "No handler for message with seq: " << message.seq;
         // Nothing to do with message, so just drop it on the floor.
         return;
     }
@@ -125,7 +127,7 @@ class BlockTransferMasterImpl : public BlockTransferMaster
             fd_ = open("/dev/bt-master", O_RDWR);
             if (fd_ < 0)
             {
-                ERROR("Could not open /dev/bt-master!\n");
+                LOG(ERROR) << "Could not open /dev/bt-master!";
                 return;
             }
             receive_thread_ = std::thread([this]()
@@ -184,7 +186,7 @@ void InitMaster()
         RpcResult result = client->SendMessage("Hello, world!");
         if (result.status < 0)
         {
-            ERROR("master: received error status: %d\n", result.status);
+            LOG(ERROR) << "master: received error status: %d\n" << result.status;
         }
         else
         {
